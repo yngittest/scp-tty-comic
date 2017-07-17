@@ -1,28 +1,27 @@
 'use strict';
 
 const Spooky = require('spooky');
-const ifttt = require('./ifttt');
 
 const loginId = process.env.TSUTAYA_ID;
 const loginPass = process.env.TSUTAYA_PASS;
-const bnrPattern = process.env.BNR_PATTERN;
-const iftttKey = process.env.IFTTT_KEY;
 
-const loginUrl = 'https://www.discas.net/netdvd/tLogin.do?pT=0';
-const logoutUrl = 'http://www.discas.net/netdvd/doLogout.do?pT=0';
-const comicUrl = 'http://movie-tsutaya.tsite.jp/netdvd/topComic.do?pT=0';
+const urls = {
+  login: 'https://www.discas.net/netdvd/tLogin.do?pT=0',
+  logout: 'http://www.discas.net/netdvd/doLogout.do?pT=0',
+  history: 'https://movie-tsutaya.tsite.jp/netdvd/comic/comicRentalHistory.do?pT=0&pT=0'
+};
 
 module.exports = function() {
-  console.log('scraping');
+  console.log('scraping start!');
+
   const options = {
     child: {
-      // command: "./node_modules/.bin/casperjs",
       transport: 'http'
     },
     casper: {
       logLevel: 'debug',
       verbose: true,
-      waitTimeout: 30000
+      waitTimeout: 180000
     }
   };
 
@@ -35,46 +34,109 @@ module.exports = function() {
 
     spooky.start();
 
-    spooky.open(logoutUrl);
-
-    spooky.thenOpen(comicUrl);
-
-    spooky.thenOpen(loginUrl);
-
+    spooky.open(urls.logout);
+    spooky.thenOpen(urls.history);
+    spooky.thenOpen(urls.login);
     spooky.then([{id: loginId, pass: loginPass}, function() {
       this.fill('form#form1', {
         LOGIN_ID: id,
         PASSWORD: pass
       }, false);
     }]);
-
     spooky.thenClick('.tmBox00 .submitButton1');
-
     spooky.then(function() {
-      this.waitForSelector('.cosmo_contents-border>a>img');
+      this.waitForSelector('input[name="deleteHistoryList"]');
     });
 
     spooky.then(function() {
-      this.emit('bnrUrl', this.evaluate(function() {
-        return document.querySelector('.cosmo_contents-border>a>img').src;
-      }));
+      const pager = this.evaluate(function() {
+        return document.querySelector('.c_pager_num>ul>li:nth-last-child(3)>a').text;
+      });
+
+      var history = [];
+      for(var i = 0; i < pager; i++) {
+        this.then(function() {
+          history = history.concat(this.evaluate(function() {
+            var list = document.querySelectorAll('.c_bold>a');
+            var comics = [];
+            for(var i = 0; i < list.length; i++) {
+              comics.push({
+                text: list[i].text,
+                href: list[i].href,
+                id: list[i].href.substr(list[i].href.length - 13, 13),
+                title: list[i].text.substr(0, list[i].text.lastIndexOf('\u3000'))
+              });
+            }
+            return comics;
+          }));
+        });
+        this.then(function() {
+          if(this.exists('.c_pager_num-next>a')) {
+            this.click('.c_pager_num-next>a');
+          }
+        });
+      }
+      this.then(function() {
+        this.emit('history', history);
+      });
+
+      var titles = [];
+      this.then(function() {
+        var uniqueList = {};
+        for(var i = 0; i < history.length; i++) {
+          if(!uniqueList[history[i].title]) {
+            uniqueList[history[i].title] = history[i];
+            titles.push(history[i]);
+          }
+        }
+      });
+      this.then(function() {
+        this.emit('titles', titles);
+      });
+
+      this.then(function() {
+        var vols = [];
+        for(var i = 0; i < titles.length; i++) {
+          this.thenOpen(titles[i].href);
+          this.then(function() {
+            vols.push(this.evaluate(function() {
+              return document.querySelector('input[name="single_jan"]').value;
+            }));
+          });
+        }
+        this.then(function() {
+          this.emit('vols', vols);
+        });
+      });
     });
 
-    spooky.thenOpen(logoutUrl);
-
+    spooky.thenOpen(urls.logout);
+    spooky.then(function() {
+      this.emit('echo', 'scraping finished!');
+    });
     spooky.run();
   });
 
-  spooky.on('bnrUrl', function(url) {
-    console.log(url);
-    let values = [];
-    values[0] = url;
-    if(~url.indexOf(bnrPattern)) {
-      values[1] = 'hit!';
-      console.log(values[1]);
+  let history = [];
+  spooky.on('history', function(list) {
+    history = list;
+    console.log('history:' + history.length);
+  });
+
+  let titles = [];
+  spooky.on('titles', function(list) {
+    titles = list;
+    console.log('titles:' + titles.length);
+  });
+
+  spooky.on('vols', function(list) {
+    console.log('vols:' + list.length);
+    for(var i = 0; i < list.length; i++) {
+      titles[i].vols = list[i].split(',');
     }
-    values[2] = comicUrl;
-    ifttt('tsutaya', iftttKey, values);
+    for(let element of titles) {
+      console.log(JSON.stringify(element));
+    }
   });
 
   spooky.on('echo', function(msg) {
