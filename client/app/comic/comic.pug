@@ -1,0 +1,29 @@
+.container
+  uib-tabset(active="active")
+    uib-tab(index="0" heading="comic")
+      div title count {{ comicCtrl.titles.length }}
+      table.table.table-hover
+        thead
+          tr
+            th title
+            th vols
+        tbody
+          tr(ng-repeat="comic in comicCtrl.titles")
+            td
+              a(href="{{ comic.url }}") {{ comic.title }}
+            td {{ comic.vols.length }}
+    uib-tab(index="1" heading="history")
+      div history count {{ comicCtrl.history.length }}
+      table.table.table-hover
+        thead
+          tr
+            th name
+            th id
+        tbody(ng-repeat="(key, value) in comicCtrl.history | groupBy: 'title'")
+          tr(ng-click="isCollapsed = !isCollapsed")
+            td(colspan="2")
+              strong {{ key }}
+          tr(uib-collapse="!isCollapsed" ng-repeat="comic in value | orderBy: 'id'")
+            td
+              a(href="{{ comic.url }}") {{ comic.name }}
+            td {{ comic.id }}

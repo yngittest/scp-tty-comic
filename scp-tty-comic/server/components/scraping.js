@@ -2,7 +2,6 @@
 
 const Spooky = require('spooky');
 import History from '../api/history/history.model';
-import Comic from '../api/comic/comic.model';
 
 const loginId = process.env.TSUTAYA_ID;
 const loginPass = process.env.TSUTAYA_PASS;
@@ -63,8 +62,8 @@ module.exports = function() {
             var comics = [];
             for(var i = 0; i < list.length; i++) {
               comics.push({
-                name: list[i].text,
-                url: list[i].href,
+                text: list[i].text,
+                href: list[i].href,
                 id: list[i].href.substr(list[i].href.length - 13, 13),
                 title: list[i].text.substr(0, list[i].text.lastIndexOf('\u3000'))
               });
@@ -78,28 +77,17 @@ module.exports = function() {
           }
         });
       }
-
-      var uniqueHistory = [];
       this.then(function() {
-        var uniqueList = {};
-        for(var i = 0; i < history.length; i++) {
-          if(!uniqueList[history[i].id]) {
-            uniqueList[history[i].id] = history[i];
-            uniqueHistory.push(history[i]);
-          }
-        }
-      });
-      this.then(function() {
-        this.emit('history', uniqueHistory);
+        this.emit('history', history);
       });
 
       var titles = [];
       this.then(function() {
         var uniqueList = {};
-        for(var i = 0; i < uniqueHistory.length; i++) {
-          if(!uniqueList[uniqueHistory[i].title]) {
-            uniqueList[uniqueHistory[i].title] = uniqueHistory[i];
-            titles.push(uniqueHistory[i]);
+        for(var i = 0; i < history.length; i++) {
+          if(!uniqueList[history[i].title]) {
+            uniqueList[history[i].title] = history[i];
+            titles.push(history[i]);
           }
         }
       });
@@ -110,7 +98,7 @@ module.exports = function() {
       this.then(function() {
         var vols = [];
         for(var i = 0; i < titles.length; i++) {
-          this.thenOpen(titles[i].url);
+          this.thenOpen(titles[i].href);
           this.then(function() {
             vols.push(this.evaluate(function() {
               return document.querySelector('input[name="single_jan"]').value;
@@ -124,7 +112,10 @@ module.exports = function() {
     });
 
     spooky.then(function() {
-      this.emit('load');
+      this.emit('join', 'hoge');
+    });
+    spooky.then(function() {
+      this.emit('load', 'hoge');
     });
 
     spooky.thenOpen(urls.logout);
@@ -134,11 +125,10 @@ module.exports = function() {
     spooky.run();
   });
 
+  let history = [];
   spooky.on('history', function(list) {
-    console.log('history:' + list.length);
-    for(var i = 0; i < list.length; i++) {
-      History.findOneAndUpdate({name: list[i].name}, list[i], {upsert: true}).exec();
-    }
+    history = list;
+    console.log('history:' + history.length);
   });
 
   let titles = [];
@@ -147,18 +137,26 @@ module.exports = function() {
     console.log('titles:' + titles.length);
   });
 
+  let vols = [];
   spooky.on('vols', function(list) {
-    console.log('vols:' + list.length);
-    for(var i = 0; i < list.length; i++) {
-      titles[i].vols = list[i].split(',');
-      titles[i].url = titles[i].url.substr(0, titles[i].url.length - 13) + titles[i].vols[titles[i].vols.length - 1];
+    vols = list;
+    console.log('vols:' + vols.length);
+  });
+
+  spooky.on('join', function(aaa) {
+    console.log('join');
+    for(var i = 0; i < titles.length; i++) {
+      titles[i].vols = vols[i].split(',');
     }
   });
 
-  spooky.on('load', function() {
+  spooky.on('load', function(aaa) {
     console.log('load');
-    for(var i = 0; i < titles.length; i++) {
-      Comic.findOneAndUpdate({title: titles[i].title}, titles[i], {upsert: true}).exec();
+    for(let element of titles) {
+      console.log(JSON.stringify(element));
+      // History.findOneAndUpdate({id: element.id}, element, {upsert: true}, function(error, results) {
+      //   console.log(element.title);
+      // });
     }
   });
 
