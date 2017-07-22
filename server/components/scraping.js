@@ -58,6 +58,9 @@ module.exports = function() {
       var history = [];
       for(var i = 0; i < pager; i++) {
         this.then(function() {
+          this.waitForSelector('.c_bold>a');
+        });
+        this.then(function() {
           history = history.concat(this.evaluate(function() {
             var list = document.querySelectorAll('.c_bold>a');
             var comics = [];
@@ -112,20 +115,35 @@ module.exports = function() {
         for(var i = 0; i < titles.length; i++) {
           this.thenOpen(titles[i].url);
           this.then(function() {
+            this.waitForSelector('input[name="single_jan"]');
+          });
+          this.then(function() {
             vols.push(this.evaluate(function() {
-              return document.querySelector('input[name="single_jan"]').value;
+              return document.querySelector('input[name="single_jan"]').value.split(',');
             }));
           });
         }
+        var comics = [];
         this.then(function() {
-          this.emit('vols', vols);
+          for(var i = 0; i < vols.length; i++) {
+            for(var j = 0; j < vols[i].length; j++) {
+              comics.push({
+                title: titles[i].title,
+                url: titles[i].url.substr(0, titles[i].url.length - 13) + vols[i][j],
+                id: vols[i][j]
+              });
+            }
+          }
+        });
+        this.then(function() {
+          this.emit('comics', comics);
         });
       });
     });
 
-    spooky.then(function() {
-      this.emit('load');
-    });
+    // spooky.then(function() {
+    //   this.emit('load');
+    // });
 
     spooky.thenOpen(urls.logout);
     spooky.then(function() {
@@ -147,20 +165,23 @@ module.exports = function() {
     console.log('titles:' + titles.length);
   });
 
-  spooky.on('vols', function(list) {
-    console.log('vols:' + list.length);
-    for(var i = 0; i < list.length; i++) {
-      titles[i].vols = list[i].split(',');
-      titles[i].url = titles[i].url.substr(0, titles[i].url.length - 13) + titles[i].vols[titles[i].vols.length - 1];
+  spooky.on('comics', function(list) {
+    console.log('comics:' + list.length);
+    for(var i = 0; i < 5; i++) {
+      console.log(list[i]);
     }
+    // for(var i = 0; i < list.length; i++) {
+    //   titles[i].vols = list[i].split(',');
+    //   titles[i].url = titles[i].url.substr(0, titles[i].url.length - 13) + titles[i].vols[titles[i].vols.length - 1];
+    // }
   });
 
-  spooky.on('load', function() {
-    console.log('load');
-    for(var i = 0; i < titles.length; i++) {
-      Comic.findOneAndUpdate({title: titles[i].title}, titles[i], {upsert: true}).exec();
-    }
-  });
+  // spooky.on('load', function() {
+  //   console.log('load');
+  //   for(var i = 0; i < titles.length; i++) {
+  //     Comic.findOneAndUpdate({title: titles[i].title}, titles[i], {upsert: true}).exec();
+  //   }
+  // });
 
   spooky.on('echo', function(msg) {
     console.log(msg);
