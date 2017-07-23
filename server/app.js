@@ -10,7 +10,7 @@ mongoose.Promise = require('bluebird');
 import config from './config/environment';
 import http from 'http';
 import seedDatabaseIfNeeded from './config/seed';
-import startCron from './components/cron';
+import cron from './cron';
 
 // Connect to MongoDB
 mongoose.connect(config.mongo.uri, config.mongo.options);
@@ -38,7 +38,7 @@ function startServer() {
 }
 
 seedDatabaseIfNeeded();
-startCron();
+cron();
 setImmediate(startServer);
 
 // Expose app

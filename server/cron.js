@@ -2,20 +2,20 @@
 
 const CronJob = require('cron').CronJob;
 
-import scraping from './scraping';
+import scraping from './scraping/scraping';
 
 const type = process.env.BATCH_TYPE;
+const cronTime = process.env.CRON_TIME;
+const timezone = process.env.TIMEZONE;
 
 export default function startCron() {
   if(type == 'now') {
-    console.log('now!');
+    console.log('start now!');
     scraping();
   } else if(type == 'cron') {
-    console.log('cron start!');
-    const cronTime = '00 */5 * * * *';
-    const timezone = 'Asia/Tokyo';
+    console.log('start cron!');
     const job = new CronJob(cronTime, scraping, null, true, timezone);
   } else {
-    console.log('BATCH_TYPE is not configured');
+    console.log('env "BATCH_TYPE" is not configured');
   }
 }

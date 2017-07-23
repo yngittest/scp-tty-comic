@@ -15,7 +15,7 @@ export class ComicComponent {
 
   $onInit() {
     this.getHistory();
-    this.getTitles();
+    this.getComics();
   }
 
   getHistory() {
@@ -26,11 +26,11 @@ export class ComicComponent {
       });
   }
 
-  getTitles() {
+  getComics() {
     this.$http.get('/api/comics')
       .then(response => {
-        this.titles = response.data;
-        this.socket.syncUpdates('comic', this.titles);
+        this.comics = response.data;
+        this.socket.syncUpdates('comic', this.comics);
       });
   }
 }
