@@ -19,7 +19,7 @@
             td
               input.pull-right(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
             td
-              span.glyphicon.glyphicon-remove.pull-right(ng-show="{{ comic.new }}" ng-click="comicCtrl.clearNew(comic)")
+              span.glyphicon.glyphicon-ok.pull-right(ng-show="{{ comic.new }}" ng-click="comicCtrl.clearNew(comic)")
 
         tbody(ng-repeat="(key, value) in comicCtrl.comics | groupBy: 'title'")
           tr(ng-click="comicsIsCollapsed = !comicsIsCollapsed")

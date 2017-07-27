@@ -102,12 +102,10 @@ function getComics(vols, historyIdList, callback) {
 
   spooky.on('load', function() {
     console.log(`${comics.length} new comics added`);
-    Comic.update({}, {new: false}, {multi: true}).exec(function(err, doc) {
-      for(let comic of comics) {
-        Comic.findOneAndUpdate({id: comic.id}, comic, {upsert: true}).exec();
-      }
-      return callback();
-    });
+    for(let comic of comics) {
+      Comic.findOneAndUpdate({id: comic.id}, comic, {upsert: true}).exec();
+    }
+    return callback();
   });
 
   spooky.on('error', function(e, stack) {
