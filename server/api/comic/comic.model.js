@@ -8,7 +8,8 @@ var ComicSchema = new mongoose.Schema({
   url: String,
   id: String,
   title: String,
-  recent: Boolean
+  new: Boolean,
+  read: Boolean
 });
 
 registerEvents(ComicSchema);

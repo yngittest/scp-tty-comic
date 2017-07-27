@@ -3,27 +3,44 @@
     uib-tab(index="0" heading="comic")
       div comic count {{ comicCtrl.comics.length }}
       table.table.table-hover
-        thead
-          tr
-            th name
+        tbody(ng-show="comicCtrl.newComics.length")
+          tr.info(ng-click="newIsCollapsed = !newIsCollapsed")
+            td(colspan="2")
+              strong recently added &nbsp;
+              span.badge {{ comicCtrl.newComics.length }}
+              button.btn.btn-default.pull-right(ng-click="comicCtrl.clearNewAll()") clear all
+            td
+              span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="newIsCollapsed")
+              span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="newIsCollapsed")
+          tr(uib-collapse="!newIsCollapsed" ng-repeat="comic in comicCtrl.newComics | orderBy: 'title'")
+            td
+              a(href="{{ comic.url }}") {{ comic.name }} &nbsp;
+              span.label.label-info(ng-show="{{ comic.new }}") new!
+            td
+              input.pull-right(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
+            td
+              span.glyphicon.glyphicon-remove.pull-right(ng-show="{{ comic.new }}" ng-click="comicCtrl.clearNew(comic)")
+
         tbody(ng-repeat="(key, value) in comicCtrl.comics | groupBy: 'title'")
           tr(ng-click="comicsIsCollapsed = !comicsIsCollapsed")
             td(colspan="2")
               strong {{ key }} &nbsp;
               span.badge {{ value.length }}
+            td
               span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="comicsIsCollapsed")
               span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="comicsIsCollapsed")
           tr(uib-collapse="!comicsIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
             td
-              a(href="{{ comic.url }}") {{ comic.name }}
+              a(href="{{ comic.url }}") {{ comic.name }} &nbsp;
+              span.label.label-info(ng-show="{{ comic.new }}") new!
             td
-              span.glyphicon.glyphicon-star.pull-right(ng-show="{{ comic.recent }}")
+              input.pull-right(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
+            td
+              span.glyphicon.glyphicon-remove.pull-right(ng-click="comicCtrl.deleteComic(comic)")
+
     uib-tab(index="1" heading="history")
       div history count {{ comicCtrl.history.length }}
       table.table.table-hover
-        thead
-          tr
-            th name
         tbody(ng-repeat="(key, value) in comicCtrl.history | groupBy: 'title'")
           tr(ng-click="historyIsCollapsed = !historyIsCollapsed")
             td

@@ -9,6 +9,7 @@ module.exports = {
     comicConf: 'http://movie-tsutaya.tsite.jp/netdvd/comic/comicConf.do?id='
   },
   maxVolsAtOnce: 30,
+  bnrPattern: process.env.BNR_PATTERN,
   spookyOptions: {
     child: {
       transport: 'http'

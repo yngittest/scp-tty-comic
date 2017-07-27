@@ -5,30 +5,21 @@ const Spooky = require('spooky');
 import constant from '../config/scraping';
 import common from './common';
 import History from '../api/history/history.model';
-import Comic from '../api/comic/comic.model';
 import Vol from '../api/vol/vol.model';
 
 module.exports = function(callback) {
   console.log('get vols start!');
   History.find().exec(function(err, docs) {
     const titles = common.distinct(docs, 'title');
-    Comic.find().exec(function(err, docs) {
-      let comics = [];
-      for(let vol of docs) {
-        comics.push(vol.id);
-      }
-      getVols(titles, comics, function() {
-        return callback();
-      });
+    getVols(titles, function() {
+      console.log('get vols finished!');
+      return callback();
     });
   });
 };
 
-function getVols(titles, comics, callback) {
+function getVols(titles, callback) {
   console.log(`titles: ${titles.length}`);
-
-  let vols = [];
-  let volsCount = 0;
 
   const spooky = new Spooky(constant.spookyOptions, function(err) {
     if(err) {
@@ -47,7 +38,7 @@ function getVols(titles, comics, callback) {
         this.waitForSelector('input[name="single_jan"]');
       });
       spooky.then(function() {
-        this.emit('getVols', this.evaluate(function() {
+        this.emit('getVol', this.evaluate(function() {
           return document.querySelector('input[name="single_jan"]').value.split(',');
         }));
       });
@@ -60,7 +51,10 @@ function getVols(titles, comics, callback) {
     spooky.run();
   });
 
-  spooky.on('getVols', function(list) {
+  let vols = [];
+  let volsCount = 0;
+
+  spooky.on('getVol', function(list) {
     vols = vols.concat(list);
     volsCount++;
     console.log(`${volsCount}/${titles.length} ${titles[volsCount-1].title} +${list.length} vols ${vols.length}`);
@@ -71,7 +65,6 @@ function getVols(titles, comics, callback) {
     for(let vol of vols) {
       Vol.findOneAndUpdate({id: vol}, {id: vol}, {upsert: true}).exec();
     }
-    console.log('get vols finished!');
     return callback();
   });
 

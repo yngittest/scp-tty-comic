@@ -7,7 +7,17 @@
 import errors from './components/errors';
 import path from 'path';
 
+import basicAuth from 'basic-auth-connect';
+
 export default function(app) {
+  // Add Basic Auth
+  // const basicAuth = require('basic-auth-connect');
+  const username = process.env.BASIC_AUTH_USERNAME;
+  const password = process.env.BASIC_AUTH_PASSWORD;
+  if(username && password) {
+    app.use(basicAuth(username, password));
+  }
+
   // Insert routes below
   app.use('/api/vols', require('./api/vol'));
   app.use('/api/comics', require('./api/comic'));

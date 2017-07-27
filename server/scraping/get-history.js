@@ -8,6 +8,13 @@ import History from '../api/history/history.model';
 
 module.exports = function(callback) {
   console.log('get history start!');
+  getHistory(function() {
+    console.log('get history finished!');
+    return callback();
+  });
+};
+
+function getHistory(callback) {
   const spooky = new Spooky(constant.spookyOptions, function(err) {
     if(err) {
       let e = new Error('Failed to initialize SpookyJS');
@@ -39,25 +46,21 @@ module.exports = function(callback) {
         return document.querySelector('.c_pager_num>ul>li:nth-last-child(3)>a').text;
       });
 
-      var history = [];
       for(var i = 0; i < pager; i++) {
         this.then(function() {
           this.waitForSelector('input[name="deleteHistoryList"]');
         });
         this.then(function() {
-          history = history.concat(this.evaluate(function() {
-            var list = document.querySelectorAll('.c_bold>a');
+          this.emit('getHistory', (this.evaluate(function() {
             var comics = [];
-            for(var i = 0; i < list.length; i++) {
+            Array.prototype.forEach.call(document.querySelectorAll('.c_bold>a'), function(node) {
               comics.push({
-                name: list[i].text,
-                url: list[i].href,
-                id: list[i].href.substr(list[i].href.length - 13, 13),
-                title: list[i].text.substr(0, list[i].text.lastIndexOf('\u3000'))
+                text: node.text,
+                href: node.href
               });
-            }
+            });
             return comics;
-          }));
+          })));
         });
         this.then(function() {
           if(this.exists('.c_pager_num-next>a')) {
@@ -67,7 +70,7 @@ module.exports = function(callback) {
       }
 
       this.then(function() {
-        this.emit('load', history);
+        this.emit('load');
       });
     });
 
@@ -75,16 +78,31 @@ module.exports = function(callback) {
     spooky.run();
   });
 
-  spooky.on('load', function(list) {
-    console.log('history:' + list.length);
+  let history = [];
+  let pagerCount = 0;
 
-    const uniqueHistory = common.distinct(list, 'id');
-    console.log('uniqueHistory:' + uniqueHistory.length);
+  spooky.on('getHistory', function(list) {
+    for(let element of list) {
+      history.push({
+        name: element.text,
+        url: element.href,
+        id: element.href.substr(element.href.length - 13, 13),
+        title: element.text.substr(0, element.text.lastIndexOf('\u3000'))
+      });
+    }
+    pagerCount++;
+    console.log(`get history pager ${pagerCount}`);
+  });
+
+  spooky.on('load', function() {
+    console.log(`history: ${history.length}`);
+
+    const uniqueHistory = common.distinct(history, 'id');
+    console.log(`unique history: ${uniqueHistory.length}`);
 
     for(let comic of uniqueHistory) {
       History.findOneAndUpdate({name: comic.name}, comic, {upsert: true}).exec();
     }
-    console.log('get history finished!');
     return callback();
   });
 
@@ -95,4 +113,4 @@ module.exports = function(callback) {
     }
     return callback();
   });
-};
+}
