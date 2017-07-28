@@ -7,19 +7,13 @@ import checkBanner from './check-banner';
 
 module.exports = function() {
   console.log('scraping start!');
-  // checkBanner(function() {
-  //   getHistory(function() {
-  //     getVols(function() {
-  //       getComics(function() {
-  //         console.log('scraping finished');
-  //       });
-  //     });
-  //   });
-  // });
-  getComics(function() {
-    console.log('scraping finished');
+  checkBanner(function() {
+    getHistory(function() {
+      getVols(function() {
+        getComics(function() {
+          console.log('scraping finished');
+        });
+      });
+    });
   });
-  // checkBanner(function() {
-  //   console.log('scraping finished');
-  // });
 };
