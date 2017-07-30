@@ -318,29 +318,21 @@ gulp.task('start:server:debug', () => {
 });
 
 gulp.task('start:batch:check-bnr', () => {
-    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-    config = require(`./${serverPath}/config/environment`);
     nodemon({script: 'server/scraping/bat-check-bnr.js'})
         .on('log', onServerLog);
 });
 
 gulp.task('start:batch:get-history', () => {
-    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-    config = require(`./${serverPath}/config/environment`);
     nodemon({script: 'server/scraping/bat-get-history.js'})
         .on('log', onServerLog);
 });
 
 gulp.task('start:batch:get-vols', () => {
-    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-    config = require(`./${serverPath}/config/environment`);
     nodemon({script: 'server/scraping/bat-get-vols.js'})
         .on('log', onServerLog);
 });
 
 gulp.task('start:batch:get-comics', () => {
-    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-    config = require(`./${serverPath}/config/environment`);
     nodemon({script: 'server/scraping/bat-get-comics.js'})
         .on('log', onServerLog);
 });

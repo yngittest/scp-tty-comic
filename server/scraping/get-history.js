@@ -3,7 +3,6 @@
 const Spooky = require('spooky');
 
 import constant from '../config/scraping';
-import common from './common';
 import History from '../api/history/history.model';
 
 module.exports = function(callback) {
@@ -76,7 +75,7 @@ function getHistory(callback) {
       }
 
       this.then(function() {
-        this.emit('load');
+        this.emit('end');
       });
     });
 
@@ -84,31 +83,25 @@ function getHistory(callback) {
     spooky.run();
   });
 
-  let history = [];
+  let historyCount = 0;
   let pagerCount = 0;
 
   spooky.on('getHistory', function(list) {
     for(let element of list) {
-      history.push({
+      History.findOneAndUpdate({name: element.text}, {
         name: element.text,
         url: element.href,
         id: element.href.substr(element.href.length - 13, 13),
         title: element.text.substr(0, element.text.lastIndexOf('\u3000'))
-      });
+      }, {upsert: true}).exec();
+      historyCount++;
     }
     pagerCount++;
     console.log(`get history pager ${pagerCount}`);
   });
 
-  spooky.on('load', function() {
-    console.log(`history: ${history.length}`);
-
-    const uniqueHistory = common.distinct(history, 'id');
-    console.log(`unique history: ${uniqueHistory.length}`);
-
-    for(let comic of uniqueHistory) {
-      History.findOneAndUpdate({name: comic.name}, comic, {upsert: true}).exec();
-    }
+  spooky.on('end', function() {
+    console.log(`history: ${historyCount}`);
     return callback();
   });
 

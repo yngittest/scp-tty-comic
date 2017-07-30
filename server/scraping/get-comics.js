@@ -3,7 +3,6 @@
 const Spooky = require('spooky');
 
 import constant from '../config/scraping';
-import common from './common';
 import Comic from '../api/comic/comic.model';
 import Vol from '../api/vol/vol.model';
 import History from '../api/history/history.model';
@@ -78,7 +77,7 @@ function getComics(vols, historyIdList, callback) {
     }
 
     spooky.then(function() {
-      this.emit('load');
+      this.emit('end');
     });
 
     spooky.run();
@@ -99,8 +98,8 @@ function getComics(vols, historyIdList, callback) {
     console.log(`${comicsCount}/${vols.length} ${comic.name}`);
   });
 
-  spooky.on('load', function() {
-    console.log(`${comicsCount} new comics added`);
+  spooky.on('end', function() {
+    console.log(`new comics: ${comicsCount}`);
     return callback();
   });
 

@@ -22,7 +22,7 @@ export class ComicComponent {
   getHistory() {
     this.$http.get('/api/historys')
       .then(response => {
-        this.history = response.data;
+        this.history = this.$filter('orderBy')(response.data, 'title');
         this.socket.syncUpdates('history', this.history);
       });
   }
@@ -41,6 +41,10 @@ export class ComicComponent {
     this.getComics();
   }
 
+  deleteComic(comic) {
+    this.$http.delete(`/api/comics/${comic._id}`);
+  }
+
   clearNew(comic) {
     comic.new = false;
     this.updateComic(comic);
@@ -52,9 +56,10 @@ export class ComicComponent {
     }
   }
 
-  deleteComic(comic) {
-    this.$http.delete(`/api/comics/${comic._id}`);
+  deleteHistory(comic) {
+    this.$http.delete(`/api/historys/${comic._id}`);
   }
+
 }
 
 export default angular.module('scpTtyComicApp.comic', [uiRouter, filter])

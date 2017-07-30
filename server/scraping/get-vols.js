@@ -45,26 +45,26 @@ function getVols(titles, callback) {
     }
 
     spooky.then(function() {
-      this.emit('load');
+      this.emit('end');
     });
 
     spooky.run();
   });
 
-  let vols = [];
   let volsCount = 0;
+  let titlesCount = 0;
 
   spooky.on('getVol', function(list) {
-    vols = vols.concat(list);
-    volsCount++;
-    console.log(`${volsCount}/${titles.length} ${titles[volsCount-1].title} +${list.length} vols ${vols.length}`);
+    for(let vol of list) {
+      Vol.findOneAndUpdate({id: vol}, {id: vol}, {upsert: true}).exec();
+      volsCount++;
+    }
+    titlesCount++;
+    console.log(`${titlesCount}/${titles.length} ${titles[titlesCount-1].title} +${list.length}`);
   });
 
-  spooky.on('load', function() {
-    console.log(`vols total ${vols.length}`);
-    for(let vol of vols) {
-      Vol.findOneAndUpdate({id: vol}, {id: vol}, {upsert: true}).exec();
-    }
+  spooky.on('end', function() {
+    console.log(`vols: ${volsCount}`);
     return callback();
   });
 
