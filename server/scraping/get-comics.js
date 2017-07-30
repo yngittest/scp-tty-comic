@@ -84,27 +84,23 @@ function getComics(vols, historyIdList, callback) {
     spooky.run();
   });
 
-  let comics = [];
   let comicsCount = 0;
 
   spooky.on('getComic', function(comic) {
-    comics.push({
+    Comic.findOneAndUpdate({id: comic.id}, {
       name: comic.name,
       url: constant.urls.comicConf + comic.id,
       id: comic.id,
       title: comic.name.substr(0, comic.name.lastIndexOf('\u3000')),
       new: true,
       read: historyIdList.indexOf(comic.id) >= 0
-    });
+    }, {upsert: true}).exec();
     comicsCount++;
     console.log(`${comicsCount}/${vols.length} ${comic.name}`);
   });
 
   spooky.on('load', function() {
-    console.log(`${comics.length} new comics added`);
-    for(let comic of comics) {
-      Comic.findOneAndUpdate({id: comic.id}, comic, {upsert: true}).exec();
-    }
+    console.log(`${comicsCount} new comics added`);
     return callback();
   });
 

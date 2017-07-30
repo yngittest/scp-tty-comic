@@ -317,6 +317,34 @@ gulp.task('start:server:debug', () => {
         .on('log', onServerLog);
 });
 
+gulp.task('start:batch:check-bnr', () => {
+    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+    config = require(`./${serverPath}/config/environment`);
+    nodemon({script: 'server/scraping/bat-check-bnr.js'})
+        .on('log', onServerLog);
+});
+
+gulp.task('start:batch:get-history', () => {
+    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+    config = require(`./${serverPath}/config/environment`);
+    nodemon({script: 'server/scraping/bat-get-history.js'})
+        .on('log', onServerLog);
+});
+
+gulp.task('start:batch:get-vols', () => {
+    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+    config = require(`./${serverPath}/config/environment`);
+    nodemon({script: 'server/scraping/bat-get-vols.js'})
+        .on('log', onServerLog);
+});
+
+gulp.task('start:batch:get-comics', () => {
+    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+    config = require(`./${serverPath}/config/environment`);
+    nodemon({script: 'server/scraping/bat-get-comics.js'})
+        .on('log', onServerLog);
+});
+
 gulp.task('watch', () => {
     var testFiles = _.union(paths.client.test, paths.server.test.unit, paths.server.test.integration);
 
@@ -368,6 +396,38 @@ gulp.task('serve:dist', cb => {
         'env:prod',
         ['start:server:prod', 'start:client'],
         cb);
+});
+
+gulp.task('batch:check-bnr', cb => {
+    runSequence(
+        'env:all',
+        'start:batch:check-bnr',
+        cb
+    );
+});
+
+gulp.task('batch:get-history', cb => {
+    runSequence(
+        'env:all',
+        'start:batch:get-history',
+        cb
+    );
+});
+
+gulp.task('batch:get-vols', cb => {
+    runSequence(
+        'env:all',
+        'start:batch:get-vols',
+        cb
+    );
+});
+
+gulp.task('batch:get-comics', cb => {
+    runSequence(
+        'env:all',
+        'start:batch:get-comics',
+        cb
+    );
 });
 
 gulp.task('test', cb => {

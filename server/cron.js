@@ -2,7 +2,7 @@
 
 const CronJob = require('cron').CronJob;
 
-import scraping from './scraping/scraping';
+import scraping from './scraping/scp-comic';
 
 const type = process.env.BATCH_TYPE;
 const cronTime = process.env.CRON_TIME;

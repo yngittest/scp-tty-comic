@@ -27,6 +27,9 @@ function getHistory(callback) {
     spooky.open(constant.urls.logout);
     spooky.thenOpen(constant.urls.comicHistory);
     spooky.thenOpen(constant.urls.login);
+    spooky.then(function() {
+      this.waitForSelector('form#form1');
+    });
     spooky.then([{
       id: constant.loginId,
       pass: constant.loginPass
@@ -38,7 +41,10 @@ function getHistory(callback) {
     }]);
     spooky.thenClick('.tmBox00 .submitButton1');
     spooky.then(function() {
-      this.waitForSelector('input[name="deleteHistoryList"]');
+      this.emit('echo', 'login succeeded');
+    });
+    spooky.then(function() {
+      this.waitForSelector('.c_pager_num>ul>li:nth-last-child(3)>a');
     });
 
     spooky.then(function() {
@@ -104,6 +110,10 @@ function getHistory(callback) {
       History.findOneAndUpdate({name: comic.name}, comic, {upsert: true}).exec();
     }
     return callback();
+  });
+
+  spooky.on('echo', function(msg) {
+    console.log(msg);
   });
 
   spooky.on('error', function(e, stack) {
