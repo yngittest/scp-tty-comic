@@ -54,12 +54,17 @@ function checkBanner(callback) {
     console.log(url);
     Banner.find({}, {}, {sort: {updated: -1}, limit:1})
       .exec(function(err, docs) {
-        if(url !== docs[0].url) {
-          console.log(`new banner: ${url}`);
-          if(~url.indexOf(constant.bnrPattern)) {
-            console.log(`new banner matched the pattern: ${url}`);
+        if(docs[0]) {
+          if(url !== docs[0].url) {
+            console.log(`new banner: ${url}`);
+            if(~url.indexOf(constant.bnrPattern)) {
+              console.log(`new banner matched the pattern: ${url}`);
+            }
           }
+        } else {
+          console.log(`new banner: ${url}`);
         }
+        
         Banner.findOneAndUpdate({url: url}, {
           url: url,
           updated: Date.now()
