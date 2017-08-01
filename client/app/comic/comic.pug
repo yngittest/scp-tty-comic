@@ -1,4 +1,6 @@
 .container
+  img.img-responsive(src="{{ comicCtrl.banner[0].url }}")
+
   uib-tabset(active="active")
     uib-tab(index="0" heading="comic")
       div comic count {{ comicCtrl.comics.length }}
@@ -19,7 +21,7 @@
             td
               input.pull-right(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
             td
-              span.glyphicon.glyphicon-ok.pull-right(ng-show="{{ comic.new }}" ng-click="comicCtrl.clearNew(comic)")
+              span.glyphicon.glyphicon-ok.pull-right(style="color:silver;" ng-show="{{ comic.new }}" ng-click="comicCtrl.clearNew(comic)")
 
         tbody(ng-repeat="(key, value) in comicCtrl.comics | groupBy: 'title'")
           tr(ng-click="comicsIsCollapsed = !comicsIsCollapsed")
@@ -36,7 +38,7 @@
             td
               input.pull-right(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
             td
-              span.glyphicon.glyphicon-remove.pull-right(ng-click="comicCtrl.deleteComic(comic)")
+              button.close(type='button' ng-click="comicCtrl.deleteComic(comic)") &times;
 
     uib-tab(index="1" heading="history")
       div history count {{ comicCtrl.history.length }}
@@ -53,4 +55,19 @@
             td
               a(href="{{ comic.url }}") {{ comic.name }}
             td
-              span.glyphicon.glyphicon-remove.pull-right(ng-click="comicCtrl.deleteHistory(comic)")
+              button.close(type='button' ng-click="comicCtrl.deleteHistory(comic)") &times;
+
+    uib-tab(index="2" heading="banner")
+      table.table.table-hover
+        thead
+          tr
+            th url
+            th updated
+            th
+        tbody
+          tr(ng-repeat="bnr in comicCtrl.banner")
+            td(style="word-break:break-all;")
+              a(href="{{ bnr.url }}") {{ bnr.url }}
+            td {{ bnr.updated | date : 'yyyy/MM/dd HH:mm' }}
+            td
+              button.close(type='button' ng-click='comicCtrl.deleteBanner(bnr)') &times;

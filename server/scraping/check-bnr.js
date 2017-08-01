@@ -3,6 +3,7 @@
 const Spooky = require('spooky');
 
 import constant from '../config/scraping';
+import Banner from '../api/banner/banner.model';
 
 module.exports = function(callback) {
   console.log('check banner start!');
@@ -51,10 +52,21 @@ function checkBanner(callback) {
 
   spooky.on('bnrUrl', function(url) {
     console.log(url);
-    if(~url.indexOf(constant.bnrPattern)) {
-      console.log('comic banner matched the pattern!');
-    }
-    return callback();
+    Banner.find({}, {}, {sort: {updated: -1}, limit:1})
+      .exec(function(err, docs) {
+        if(url !== docs[0].url) {
+          console.log(`new banner: ${url}`);
+          if(~url.indexOf(constant.bnrPattern)) {
+            console.log(`new banner matched the pattern: ${url}`);
+          }
+        }
+        Banner.findOneAndUpdate({url: url}, {
+          url: url,
+          updated: Date.now()
+        }, {upsert: true}).exec(function() {
+          return callback();
+        });
+      });
   });
 
   spooky.on('error', function(e, stack) {

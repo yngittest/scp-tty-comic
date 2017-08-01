@@ -17,6 +17,19 @@ export class ComicComponent {
   $onInit() {
     this.getHistory();
     this.getComics();
+    this.getBanner();
+  }
+
+  getBanner() {
+    this.$http.get('/api/banners')
+      .then(response => {
+        this.banner = this.$filter('orderBy')(response.data, '-updated');
+        this.socket.syncUpdates('banner', this.banner);
+      });
+  }
+
+  deleteBanner(bnr) {
+    this.$http.delete(`/api/banners/${bnr._id}`);
   }
 
   getHistory() {
