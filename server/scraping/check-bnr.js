@@ -64,9 +64,10 @@ function checkBanner(callback) {
         } else {
           console.log(`new banner: ${url}`);
         }
-        
+
         Banner.findOneAndUpdate({url: url}, {
           url: url,
+          filename: url.substr(url.lastIndexOf('/') + 1),
           updated: Date.now()
         }, {upsert: true}).exec(function() {
           return callback();

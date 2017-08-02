@@ -5,6 +5,7 @@ import {registerEvents} from './banner.events';
 
 var BannerSchema = new mongoose.Schema({
   url: String,
+  filename: String,
   updated: Date
 });
 

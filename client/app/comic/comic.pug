@@ -1,29 +1,38 @@
 .container
   img.img-responsive(src="{{ comicCtrl.banner[0].url }}")
-
+  br
   uib-tabset(active="active")
     uib-tab(index="0" heading="comic")
       div comic count {{ comicCtrl.comics.length }}
+      br
+      div(data-toggle="buttons")
+        label.btn.btn-default(ng-class="{active:comicCtrl.showAll}")
+          input(type="checkbox" ng-model="comicCtrl.showAll" ng-change="comicCtrl.toggleReadFilter()")
+          | show all
+      br
       table.table.table-hover
-        tbody(ng-show="comicCtrl.newComics.length")
+        tbody(ng-show="(comicCtrl.comics | filter: {new: true}).length")
           tr.info(ng-click="newIsCollapsed = !newIsCollapsed")
             td(colspan="2")
               strong recently added &nbsp;
-              span.badge {{ comicCtrl.newComics.length }}
-              button.btn.btn-default.pull-right(ng-click="comicCtrl.clearNewAll()") clear all
+              span.badge {{ (comicCtrl.comics | filter: {new: true}).length }}
+              button.btn.btn-info.btn-xs.pull-right(ng-click="comicCtrl.clearNewAll()") clear all
             td
               span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="newIsCollapsed")
               span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="newIsCollapsed")
-          tr(uib-collapse="!newIsCollapsed" ng-repeat="comic in comicCtrl.newComics | orderBy: 'title'")
+          tr(uib-collapse="newIsCollapsed" ng-repeat="comic in (comicCtrl.comics | filter: {new: true}) | orderBy: 'title'")
+            td.col-xs-1
+              div(data-toggle="buttons")
+                label.btn.btn-xs(ng-class="(comic.read) ? 'btn-success' : 'btn-default'")
+                  input(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
+                  | read
             td
               a(href="{{ comic.url }}") {{ comic.name }} &nbsp;
               span.label.label-info(ng-show="{{ comic.new }}") new!
             td
-              input.pull-right(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
-            td
               span.glyphicon.glyphicon-ok.pull-right(style="color:silver;" ng-show="{{ comic.new }}" ng-click="comicCtrl.clearNew(comic)")
 
-        tbody(ng-repeat="(key, value) in comicCtrl.comics | groupBy: 'title'")
+        tbody(ng-repeat="(key, value) in (comicCtrl.comics | filter:{read:comicCtrl.readFilter}) | groupBy: 'title'")
           tr(ng-click="comicsIsCollapsed = !comicsIsCollapsed")
             td(colspan="2")
               strong {{ key }} &nbsp;
@@ -31,17 +40,21 @@
             td
               span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="comicsIsCollapsed")
               span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="comicsIsCollapsed")
-          tr(uib-collapse="!comicsIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
+          tr(uib-collapse="comicsIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
+            td.col-xs-1
+              div(data-toggle="buttons")
+                label.btn.btn-xs(ng-class="(comic.read) ? 'btn-success' : 'btn-default'")
+                  input(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
+                  | read
             td
               a(href="{{ comic.url }}") {{ comic.name }} &nbsp;
               span.label.label-info(ng-show="{{ comic.new }}") new!
-            td
-              input.pull-right(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
             td
               button.close(type='button' ng-click="comicCtrl.deleteComic(comic)") &times;
 
     uib-tab(index="1" heading="history")
       div history count {{ comicCtrl.history.length }}
+      br
       table.table.table-hover
         tbody(ng-repeat="(key, value) in comicCtrl.history | groupBy: 'title'")
           tr(ng-click="historyIsCollapsed = !historyIsCollapsed")
@@ -61,13 +74,13 @@
       table.table.table-hover
         thead
           tr
-            th url
+            th banner filename
             th updated
             th
         tbody
           tr(ng-repeat="bnr in comicCtrl.banner")
             td(style="word-break:break-all;")
-              a(href="{{ bnr.url }}") {{ bnr.url }}
+              a(href="{{ bnr.url }}") {{ bnr.filename }}
             td {{ bnr.updated | date : 'yyyy/MM/dd HH:mm' }}
             td
               button.close(type='button' ng-click='comicCtrl.deleteBanner(bnr)') &times;

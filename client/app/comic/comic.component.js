@@ -12,12 +12,53 @@ export class ComicComponent {
     this.$http = $http;
     this.socket = socket;
     this.$filter = $filter;
+    this.readFilter = false
   }
 
   $onInit() {
-    this.getHistory();
     this.getComics();
+    this.getHistory();
     this.getBanner();
+  }
+
+  getComics() {
+    this.$http.get('/api/comics')
+      .then(response => {
+        this.comics = this.$filter('orderBy')(response.data, 'title');
+        this.socket.syncUpdates('comic', this.comics);
+      });
+  }
+
+  updateComic(comic) {
+    this.$http.put(`/api/comics/${comic._id}`, comic);
+  }
+
+  deleteComic(comic) {
+    this.$http.delete(`/api/comics/${comic._id}`);
+  }
+
+  clearNew(comic) {
+    comic.new = false;
+    this.updateComic(comic);
+  }
+
+  clearNewAll() {
+    let newComics = this.$filter('filter')(this.comics, {new: true});
+    for(let comic of newComics) {
+      this.clearNew(comic);
+    }
+  }
+
+  getHistory() {
+    this.$http.get('/api/historys')
+      .then(response => {
+        this.history = this.$filter('orderBy')(response.data, 'title');
+        this.socket.syncUpdates('history', this.history);
+      });
+  }
+
+  deleteHistory(comic) {
+    this.$http.delete(`/api/historys/${comic._id}`);
   }
 
   getBanner() {
@@ -32,47 +73,13 @@ export class ComicComponent {
     this.$http.delete(`/api/banners/${bnr._id}`);
   }
 
-  getHistory() {
-    this.$http.get('/api/historys')
-      .then(response => {
-        this.history = this.$filter('orderBy')(response.data, 'title');
-        this.socket.syncUpdates('history', this.history);
-      });
-  }
-
-  getComics() {
-    this.$http.get('/api/comics')
-      .then(response => {
-        this.comics = this.$filter('orderBy')(response.data, 'title');
-        this.newComics = this.$filter('filter')(response.data, {new: true});
-        this.socket.syncUpdates('comic', this.comics);
-      });
-  }
-
-  updateComic(comic) {
-    this.$http.put(`/api/comics/${comic._id}`, comic);
-    this.getComics();
-  }
-
-  deleteComic(comic) {
-    this.$http.delete(`/api/comics/${comic._id}`);
-  }
-
-  clearNew(comic) {
-    comic.new = false;
-    this.updateComic(comic);
-  }
-
-  clearNewAll() {
-    for(let comic of this.newComics) {
-      this.clearNew(comic);
+  toggleReadFilter() {
+    if (this.showAll) {
+      this.readFilter = undefined;
+    } else {
+      this.readFilter = false;
     }
   }
-
-  deleteHistory(comic) {
-    this.$http.delete(`/api/historys/${comic._id}`);
-  }
-
 }
 
 export default angular.module('scpTtyComicApp.comic', [uiRouter, filter])
