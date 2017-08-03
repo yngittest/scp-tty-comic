@@ -6,6 +6,7 @@ module.exports = {
     logout: 'http://www.discas.net/netdvd/doLogout.do?pT=0',
     comicTop: 'http://movie-tsutaya.tsite.jp/netdvd/topComic.do?pT=0',
     comicHistory: 'https://movie-tsutaya.tsite.jp/netdvd/comic/comicRentalHistory.do?pT=0&pT=0',
+    comicCart: 'https://movie-tsutaya.tsite.jp/netdvd/comic/rentalCart.do?pT=0',
     comicConf: 'http://movie-tsutaya.tsite.jp/netdvd/comic/comicConf.do?id='
   },
   maxVolsAtOnce: 30,

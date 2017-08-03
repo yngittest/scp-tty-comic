@@ -337,6 +337,11 @@ gulp.task('start:batch:get-comics', () => {
         .on('log', onServerLog);
 });
 
+gulp.task('start:batch:get-cart', () => {
+    nodemon({script: 'server/scraping/bat-get-cart.js'})
+        .on('log', onServerLog);
+});
+
 gulp.task('watch', () => {
     var testFiles = _.union(paths.client.test, paths.server.test.unit, paths.server.test.integration);
 
@@ -418,6 +423,14 @@ gulp.task('batch:get-comics', cb => {
     runSequence(
         'env:all',
         'start:batch:get-comics',
+        cb
+    );
+});
+
+gulp.task('batch:get-cart', cb => {
+    runSequence(
+        'env:all',
+        'start:batch:get-cart',
         cb
     );
 });

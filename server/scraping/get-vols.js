@@ -5,15 +5,20 @@ const Spooky = require('spooky');
 import constant from '../config/scraping';
 import common from './common';
 import History from '../api/history/history.model';
+import Cart from '../api/cart/cart.model';
 import Vol from '../api/vol/vol.model';
 
 module.exports = function(callback) {
   console.log('get vols start!');
   History.find().exec(function(err, docs) {
-    const titles = common.distinct(docs, 'title');
-    getVols(titles, function() {
-      console.log('get vols finished!');
-      return callback();
+    const history = docs;
+    Cart.find().exec(function(err, docs) {
+      const comics = history.concat(docs);
+      const titles = common.distinct(comics, 'title');
+      getVols(titles, function() {
+        console.log('get vols finished!');
+        return callback();
+      });
     });
   });
 };

@@ -19,6 +19,7 @@ export default function(app) {
   }
 
   // Insert routes below
+  app.use('/api/cart', require('./api/cart'));
   app.use('/api/banners', require('./api/banner'));
   app.use('/api/vols', require('./api/vol'));
   app.use('/api/comics', require('./api/comic'));
