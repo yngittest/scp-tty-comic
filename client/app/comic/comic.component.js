@@ -49,6 +49,15 @@ export class ComicComponent {
     }
   }
 
+  markAllAsRead(comics) {
+    for(let comic of comics) {
+      if(!comic.read) {
+        comic.read = true;
+        this.updateComic(comic);
+      }
+    }
+  }
+
   getHistory() {
     this.$http.get('/api/historys')
       .then(response => {

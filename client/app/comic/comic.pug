@@ -37,10 +37,12 @@
             td(colspan="2")
               strong {{ key }} &nbsp;
               span.badge {{ value.length }}
+              br
+              button.btn.btn-default.btn-xs(ng-click="comicCtrl.markAllAsRead(value)" ng-show="(value | filter:{read: false}).length && comicsIsCollapsed") mark all as read
             td
               span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="comicsIsCollapsed")
               span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="comicsIsCollapsed")
-          tr(uib-collapse="comicsIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
+          tr(uib-collapse="!comicsIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
             td.col-xs-1
               div(data-toggle="buttons")
                 label.btn.btn-xs(ng-class="(comic.read) ? 'btn-success' : 'btn-default'")
