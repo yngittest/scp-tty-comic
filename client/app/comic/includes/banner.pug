@@ -1,0 +1,13 @@
+table.table.table-hover
+  thead
+    tr
+      th banner filename
+      th updated
+      th
+  tbody
+    tr(ng-repeat="bnr in comicCtrl.banner")
+      td(style="word-break:break-all;")
+        a(href="{{ bnr.url }}") {{ bnr.filename }}
+      td {{ bnr.updated | date : 'yyyy/MM/dd HH:mm' }}
+      td
+        button.close(type='button' ng-click='comicCtrl.deleteBanner(bnr)') &times;

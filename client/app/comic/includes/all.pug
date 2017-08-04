@@ -1,0 +1,52 @@
+div comic count {{ comicCtrl.comics.length }}
+br
+
+div(data-toggle="buttons")
+  label.btn.btn-default(ng-class="{active:comicCtrl.showAll}")
+    input(type="checkbox" ng-model="comicCtrl.showAll" ng-change="comicCtrl.toggleReadFilter()")
+    | show all
+br
+
+table.table.table-hover
+  tbody(ng-show="(comicCtrl.comics | filter: {new: true}).length")
+    tr.info(ng-click="newIsCollapsed = !newIsCollapsed")
+      td(colspan="2")
+        strong recently added &nbsp;
+        span.badge {{ (comicCtrl.comics | filter: {new: true}).length }}
+        button.btn.btn-info.btn-xs.pull-right(ng-click="comicCtrl.clearNewAll()") clear all
+      td
+        span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="newIsCollapsed")
+        span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="newIsCollapsed")
+    tr(uib-collapse="newIsCollapsed" ng-repeat="comic in (comicCtrl.comics | filter: {new: true}) | orderBy: 'title'")
+      td.col-xs-1
+        div(data-toggle="buttons")
+          label.btn.btn-xs(ng-class="(comic.read) ? 'btn-success' : 'btn-default'")
+            input(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
+            | read
+      td
+        a(href="{{ comic.url }}") {{ comic.name }} &nbsp;
+        span.label.label-info(ng-show="{{ comic.new }}") new!
+      td
+        span.glyphicon.glyphicon-ok.pull-right(style="color:silver;" ng-show="{{ comic.new }}" ng-click="comicCtrl.clearNew(comic)")
+
+  tbody(ng-repeat="(key, value) in (comicCtrl.comics | filter:{read:comicCtrl.readFilter}) | groupBy: 'title'")
+    tr(ng-click="comicsIsCollapsed = !comicsIsCollapsed")
+      td(colspan="2")
+        strong {{ key }} &nbsp;
+        span.badge {{ value.length }}
+        br
+        button.btn.btn-default.btn-xs(ng-click="comicCtrl.markAllAsRead(value)" ng-show="(value | filter:{read: false}).length && comicsIsCollapsed") mark all as read
+      td
+        span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="comicsIsCollapsed")
+        span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="comicsIsCollapsed")
+    tr(uib-collapse="!comicsIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
+      td.col-xs-1
+        div(data-toggle="buttons")
+          label.btn.btn-xs(ng-class="(comic.read) ? 'btn-success' : 'btn-default'")
+            input(type="checkbox" ng-model="comic.read" ng-change="comicCtrl.updateComic(comic)")
+            | read
+      td
+        a(href="{{ comic.url }}") {{ comic.name }} &nbsp;
+        span.label.label-info(ng-show="{{ comic.new }}") new!
+      td
+        button.close(type='button' ng-click="comicCtrl.deleteComic(comic)") &times;
