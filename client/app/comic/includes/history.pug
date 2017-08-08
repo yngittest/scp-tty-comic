@@ -1,5 +1,6 @@
-div history count {{ comicCtrl.history.length }}
-br
+.container
+  div history count {{ comicCtrl.history.length }}
+  br
 
 table.table.table-hover
   tbody(ng-repeat="(key, value) in comicCtrl.history | groupBy: 'title'")

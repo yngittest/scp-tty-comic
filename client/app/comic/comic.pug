@@ -1,12 +1,4 @@
-.container
-  img.img-responsive(src="{{ comicCtrl.banner[0].url }}")
-  br
-  uib-tabset(active="active")
-    uib-tab(index="0" heading="comic")
-      include includes/all.pug
-
-    uib-tab(index="1" heading="history")
-      include includes/history.pug
-
-    uib-tab(index="2" heading="banner")
-      include includes/banner.pug
+.container.hidden-xs
+  include includes/outline.pug
+.hidden-sm.hidden-md.hidden-lg
+  include includes/outline.pug

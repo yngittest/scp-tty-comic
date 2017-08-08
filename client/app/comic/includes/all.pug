@@ -1,11 +1,12 @@
-div comic count {{ comicCtrl.comics.length }}
-br
+.container
+  div comic count {{ comicCtrl.comics.length }}
+  br
 
-div(data-toggle="buttons")
-  label.btn.btn-default(ng-class="{active:comicCtrl.showAll}")
-    input(type="checkbox" ng-model="comicCtrl.showAll" ng-change="comicCtrl.toggleReadFilter()")
-    | show all
-br
+  div(data-toggle="buttons")
+    label.btn.btn-default(ng-class="{active:comicCtrl.showAll}")
+      input(type="checkbox" ng-model="comicCtrl.showAll" ng-change="comicCtrl.toggleReadFilter()")
+      | show all
+  br
 
 table.table.table-hover
   tbody(ng-show="(comicCtrl.comics | filter: {new: true}).length")
