@@ -21,24 +21,39 @@ module.exports = function(callback) {
       }
       Vol.find().exec(function(err, docs) {
         let newVols = [];
+        let readVols = [];
         for(let vol of docs) {
           if(comicIdList.indexOf(vol.id) < 0) {
             newVols.push(vol.id);
+          } else if(historyIdList.indexOf(vol.id) >= 0) {
+            readVols.push(vol.id);
           }
         }
-        if(newVols.length > 0) {
-          getComics(newVols, historyIdList, function(){
-            console.log('get comics finished!');
+        setRead(readVols, function(){
+          if(newVols.length > 0) {
+            getComics(newVols, historyIdList, function(){
+              console.log('get comics finished!');
+              return callback();
+            });
+          } else {
+            console.log('no new comics');
             return callback();
-          });
-        } else {
-          console.log('no new comics');
-          return callback();
-        }
+          }
+        });
       });
     });
   });
 };
+
+function setRead(readVols, callback) {
+  for(let i = 0; i < readVols.length; i++) {
+    Comic.update({id: readVols[i]}, { $set: {read: true} }, function() {
+      if(i >= readVols.length -1 ) {
+        return callback();
+      }
+    });
+  }
+}
 
 function getComics(vols, historyIdList, callback) {
   console.log(`new vols: ${vols.length}`);
