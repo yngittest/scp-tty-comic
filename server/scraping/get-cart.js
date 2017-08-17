@@ -65,11 +65,12 @@ function getCart(callback) {
       this.wait(3000);
     });
 
+    spooky.thenOpen(constant.urls.logout);
+    
     spooky.then(function() {
       this.emit('end');
     });
 
-    spooky.thenOpen(constant.urls.logout);
     spooky.run();
   });
 

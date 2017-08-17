@@ -80,13 +80,18 @@ function getHistory(pagerStart, callback) {
           }
         });
       }
-
-      this.then(function() {
-        this.emit('end');
-      });
     }]);
 
+    spooky.then(function() {
+      this.wait(3000);
+    });
+
     spooky.thenOpen(constant.urls.logout);
+
+    spooky.then(function() {
+      this.emit('end');
+    });
+
     spooky.run();
   });
 

@@ -9,7 +9,7 @@ module.exports = {
     comicCart: 'https://movie-tsutaya.tsite.jp/netdvd/comic/rentalCart.do?pT=0',
     comicConf: 'http://movie-tsutaya.tsite.jp/netdvd/comic/comicConf.do?id='
   },
-  maxVolsAtOnce: 30,
+  maxVolsAtOnce: process.env.MAX_VOLS_AT_ONCE,
   bnrPattern: process.env.BNR_PATTERN,
   spookyOptions: {
     child: {
