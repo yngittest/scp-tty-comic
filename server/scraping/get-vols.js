@@ -50,6 +50,10 @@ function getVols(titles, callback) {
     }
 
     spooky.then(function() {
+      this.wait(3000);
+    });
+
+    spooky.then(function() {
       this.emit('end');
     });
 
