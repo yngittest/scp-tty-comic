@@ -37,12 +37,12 @@ function checkBanner(callback) {
     }]);
     spooky.thenClick('.tmBox00 .submitButton1');
     spooky.then(function() {
-      this.waitForSelector('.cosmo_contents-border>a>img');
+      this.waitForSelector('#slide1 img');
     });
 
     spooky.then(function() {
       this.emit('bnrUrl', this.evaluate(function() {
-        return document.querySelector('.cosmo_contents-border>a>img').src;
+        return document.querySelector('#slide1 img').src;
       }));
     });
 
