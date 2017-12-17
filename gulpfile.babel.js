@@ -342,6 +342,11 @@ gulp.task('start:batch:get-cart', () => {
         .on('log', onServerLog);
 });
 
+gulp.task('start:batch:put-cart', () => {
+    nodemon({script: 'server/scraping/bat-put-cart.js'})
+        .on('log', onServerLog);
+});
+
 gulp.task('watch', () => {
     var testFiles = _.union(paths.client.test, paths.server.test.unit, paths.server.test.integration);
 
@@ -431,6 +436,14 @@ gulp.task('batch:get-cart', cb => {
     runSequence(
         'env:all',
         'start:batch:get-cart',
+        cb
+    );
+});
+
+gulp.task('batch:put-cart', cb => {
+    runSequence(
+        'env:all',
+        'start:batch:put-cart',
         cb
     );
 });
