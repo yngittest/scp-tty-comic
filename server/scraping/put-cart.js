@@ -7,6 +7,10 @@ import Comic from '../api/comic/comic.model';
 import Cart from '../api/cart/cart.model';
 
 module.exports = function(callback) {
+  if (constant.enablePutCart != 'true') {
+    console.log('skip put cart');
+    return callback();
+  }
   console.log('put cart start!');
   Cart.find().exec(function(err, docs) {
     let cartIdList = [];

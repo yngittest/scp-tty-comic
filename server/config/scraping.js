@@ -12,6 +12,7 @@ module.exports = {
   },
   maxVolsAtOnce: process.env.MAX_VOLS_AT_ONCE,
   bnrPattern: process.env.BNR_PATTERN,
+  enablePutCart: process.env.ENABLE_PUT_CART,
   spookyOptions: {
     child: {
       transport: 'http'
