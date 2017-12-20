@@ -16,8 +16,8 @@ table.table.table-hover
         span.badge {{ (comicCtrl.comics | filter: {new: true}).length }}
         button.btn.btn-info.btn-xs.pull-right(ng-click="comicCtrl.clearNewAll()") clear all
       td
-        span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="newIsCollapsed")
-        span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="newIsCollapsed")
+        span.glyphicon.glyphicon-chevron-up.pull-right(ng-show="newIsCollapsed")
+        span.glyphicon.glyphicon-chevron-down.pull-right(ng-hide="newIsCollapsed")
     tr(uib-collapse="newIsCollapsed" ng-repeat="comic in (comicCtrl.comics | filter: {new: true}) | orderBy: 'title'")
       td.col-xs-1
         div(data-toggle="buttons")
@@ -38,8 +38,8 @@ table.table.table-hover
         br
         button.btn.btn-default.btn-xs(ng-click="comicCtrl.markAllAsRead(value)" ng-show="(value | filter:{read: false}).length && comicsIsCollapsed") mark all as read
       td
-        span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="comicsIsCollapsed")
-        span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="comicsIsCollapsed")
+        span.glyphicon.glyphicon-chevron-up.pull-right(ng-show="comicsIsCollapsed")
+        span.glyphicon.glyphicon-chevron-down.pull-right(ng-hide="comicsIsCollapsed")
     tr(uib-collapse="!comicsIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
       td.col-xs-1
         div(data-toggle="buttons")

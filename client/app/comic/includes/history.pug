@@ -9,8 +9,8 @@ table.table.table-hover
         strong {{ key }} &nbsp;
         span.badge {{ value.length }}
       td
-        span.glyphicon.glyphicon-chevron-down.pull-right(ng-show="historyIsCollapsed")
-        span.glyphicon.glyphicon-chevron-up.pull-right(ng-hide="historyIsCollapsed")
+        span.glyphicon.glyphicon-chevron-up.pull-right(ng-show="historyIsCollapsed")
+        span.glyphicon.glyphicon-chevron-down.pull-right(ng-hide="historyIsCollapsed")
     tr(uib-collapse="!historyIsCollapsed" ng-repeat="comic in value | orderBy: 'id'")
       td
         a(href="{{ comic.url }}") {{ comic.name }}
