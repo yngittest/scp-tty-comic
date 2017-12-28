@@ -1,11 +1,4 @@
 'use strict';
 
-const batCommon = require('./bat-common');
-batCommon();
-
-const getHistory = require('./get-history');
-console.log('scraping start!');
-getHistory(function() {
-  console.log('scraping finished');
-  process.exit(0);
-});
+const runScraping = require('./run-scraping');
+runScraping('./get-history');

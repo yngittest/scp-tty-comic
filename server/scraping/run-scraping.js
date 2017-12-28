@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function() {
+module.exports = function(taskFilePath) {
   // Set default node environment to development
   var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -18,5 +18,13 @@ module.exports = function() {
   mongoose.connection.on('error', function(err) {
     console.error(`MongoDB connection error: ${err}`);
     process.exit(-1); // eslint-disable-line no-process-exit
-  });  
+  });
+
+  // Run scraping task
+  const scpTask = require(taskFilePath);
+  console.log(`scraping start! (${taskFilePath})`);
+  scpTask(function() {
+    console.log('scraping finished');
+    process.exit(0);
+  });
 };
