@@ -5,11 +5,13 @@ const Spooky = require('spooky');
 import constant from '../config/scraping';
 import Banner from '../api/banner/banner.model';
 
-module.exports = function(callback) {
+module.exports = async () => {
   console.log('check banner start!');
-  checkBanner(function() {
-    console.log('check banner finished!');
-    return callback();
+  return new Promise((resolve, reject) => {
+    checkBanner(function() {
+      console.log('check banner finished!');
+      resolve();
+    });
   });
 };
 

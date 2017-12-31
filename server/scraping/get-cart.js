@@ -5,12 +5,15 @@ const Spooky = require('spooky');
 import constant from '../config/scraping';
 import Cart from '../api/cart/cart.model';
 
-module.exports = function(callback) {
+module.exports = async () => {
   console.log('get cart start!');
-  Cart.remove({}, function(err) {
+
+  await Cart.remove({});
+
+  return new Promise((resolve, reject) => {
     getCart(function() {
       console.log('get cart finished!');
-      return callback();
+      resolve();
     });
   });
 };
@@ -66,7 +69,7 @@ function getCart(callback) {
     });
 
     spooky.thenOpen(constant.urls.logout);
-    
+
     spooky.then(function() {
       this.emit('end');
     });
@@ -89,7 +92,7 @@ function getCart(callback) {
   });
 
   spooky.on('end', function() {
-    console.log(`cart: ${cartCount}`);
+    console.log(`checked cart: ${cartCount}`);
     return callback();
   });
 

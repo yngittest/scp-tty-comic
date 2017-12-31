@@ -6,39 +6,44 @@ import constant from '../config/scraping';
 import Comic from '../api/comic/comic.model';
 import Cart from '../api/cart/cart.model';
 
-module.exports = function(callback) {
+module.exports = async () => {
   if (constant.enablePutCart != 'true') {
     console.log('skip put cart');
-    return callback();
+    return;
   }
   console.log('put cart start!');
-  Cart.find().exec(function(err, docs) {
-    let cartIdList = [];
+
+  let cartIdList = [];
+  await Cart.find().exec(function(err, docs) {
     for(let comic of docs) {
       cartIdList.push(comic.id);
     }
-    Comic.find({new: true}).exec(function(err, docs) {
-      let newComicIdList = [];
-      for(let comic of docs) {
-        if(cartIdList.indexOf(comic.id) < 0) {
-          newComicIdList.push(comic.id);
-        }
-      }
-      if(newComicIdList.length > 0) {
-        putCart(newComicIdList, function(){
-          console.log('put cart finished!');
-          return callback();
-        });
-      } else {
-        console.log('no new comics to put cart');
-        return callback();
-      }
-    });
   });
+
+  let newComicIdList = [];
+  await Comic.find({new: true}).exec(function(err, docs) {
+    for(let comic of docs) {
+      if(cartIdList.indexOf(comic.id) < 0) {
+        newComicIdList.push(comic.id);
+      }
+    }
+  });
+
+  if(newComicIdList.length > 0) {
+    return new Promise((resolve, reject) => {
+      putCart(newComicIdList, function() {
+        console.log('put cart finished!');
+        resolve();
+      });
+    });
+  } else {
+    console.log('no new comics to put cart');
+    return;
+  }
 };
 
 function putCart(newComicIdList, callback) {
-  console.log(`new comics: ${newComicIdList.length}`);
+  console.log(`new comics to put cart: ${newComicIdList.length}`);
 
   const spooky = new Spooky(constant.spookyOptions, function(err) {
     if(err) {

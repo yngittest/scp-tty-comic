@@ -22,9 +22,11 @@ module.exports = function(taskFilePath) {
 
   // Run scraping task
   const scpTask = require(taskFilePath);
-  console.log(`scraping start! (${taskFilePath})`);
-  scpTask(function() {
+  const runScp = async () => {
+    console.log(`scraping start! (${taskFilePath})`);
+    await scpTask();
     console.log('scraping finished');
     process.exit(0);
-  });
+  }
+  runScp();
 };

@@ -5,13 +5,18 @@ const Spooky = require('spooky');
 import constant from '../config/scraping';
 import History from '../api/history/history.model';
 
-module.exports = function(callback) {
+module.exports = async () => {
   console.log('get history start!');
-  History.find().exec(function(err, docs) {
-    const pagerStart = Math.ceil(docs.length / 20);
+
+  let pagerStart;
+  await History.find().exec(function(err, docs) {
+    pagerStart = Math.ceil(docs.length / 20);
+  });
+
+  return new Promise((resolve, reject) => {
     getHistory(pagerStart, function() {
       console.log('get history finished!');
-      return callback();
+      resolve();
     });
   });
 };

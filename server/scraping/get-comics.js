@@ -7,52 +7,55 @@ import Comic from '../api/comic/comic.model';
 import Vol from '../api/vol/vol.model';
 import History from '../api/history/history.model';
 
-module.exports = function(callback) {
+module.exports = async () => {
   console.log('get comics start!');
-  History.find().exec(function(err, docs) {
-    let historyIdList = [];
+
+  let historyIdList = [];
+  await History.find().exec(function(err, docs) {
     for(let comic of docs) {
       historyIdList.push(comic.id);
     }
-    Comic.find().exec(function(err, docs) {
-      let comicIdList = [];
-      for(let comic of docs) {
-        comicIdList.push(comic.id);
+  });
+
+  let comicIdList = [];
+  await Comic.find().exec(function(err, docs) {
+    for(let comic of docs) {
+      comicIdList.push(comic.id);
+    }
+  });
+
+  let newVols = [];
+  let readVols = [];
+  await Vol.find().exec(function(err, docs) {
+    for(let vol of docs) {
+      if(comicIdList.indexOf(vol.id) < 0) {
+        newVols.push(vol.id);
+      } else if(historyIdList.indexOf(vol.id) >= 0) {
+        readVols.push(vol.id);
       }
-      Vol.find().exec(function(err, docs) {
-        let newVols = [];
-        let readVols = [];
-        for(let vol of docs) {
-          if(comicIdList.indexOf(vol.id) < 0) {
-            newVols.push(vol.id);
-          } else if(historyIdList.indexOf(vol.id) >= 0) {
-            readVols.push(vol.id);
-          }
-        }
-        setRead(readVols, function(){
-          if(newVols.length > 0) {
-            getComics(newVols, historyIdList, function(){
-              console.log('get comics finished!');
-              return callback();
-            });
-          } else {
-            console.log('no new comics');
-            return callback();
-          }
-        });
+    }
+  });
+
+  await setRead(readVols);
+
+  if(newVols.length > 0) {
+    return new Promise((resolve, reject) => {
+      getComics(newVols, historyIdList, function() {
+        console.log('get comics finished!');
+        resolve();
       });
     });
-  });
+  } else {
+    console.log('no new comics');
+    return;
+  }
 };
 
-function setRead(readVols, callback) {
+async function setRead(readVols) {
   for(let i = 0; i < readVols.length; i++) {
-    Comic.update({id: readVols[i]}, { $set: {read: true} }, function() {
-      if(i >= readVols.length -1 ) {
-        return callback();
-      }
-    });
+    await Comic.update({id: readVols[i]}, { $set: {read: true} });
   }
+  return;
 }
 
 function getComics(vols, historyIdList, callback) {

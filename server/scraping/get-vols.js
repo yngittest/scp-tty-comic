@@ -8,17 +8,24 @@ import History from '../api/history/history.model';
 import Cart from '../api/cart/cart.model';
 import Vol from '../api/vol/vol.model';
 
-module.exports = function(callback) {
+module.exports = async () => {
   console.log('get vols start!');
-  History.find().exec(function(err, docs) {
-    const history = docs;
-    Cart.find().exec(function(err, docs) {
-      const comics = history.concat(docs);
-      const titles = common.distinct(comics, 'title');
-      getVols(titles, function() {
-        console.log('get vols finished!');
-        return callback();
-      });
+
+  let history;
+  await History.find().exec(function(err, docs) {
+    history = docs;
+  });
+
+  let titles;
+  await Cart.find().exec(function(err, docs) {
+    const comics = history.concat(docs);
+    titles = common.distinct(comics, 'title');
+  });
+
+  return new Promise((resolve, reject) => {
+    getVols(titles, function() {
+      console.log('get vols finished!');
+      resolve();
     });
   });
 };
