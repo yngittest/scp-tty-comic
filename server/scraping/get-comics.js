@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const Spooky = require('spooky');
 
 import constant from '../config/scraping';
@@ -12,28 +13,26 @@ module.exports = async () => {
 
   let historyIdList = [];
   await History.find().exec(function(err, docs) {
-    for(let comic of docs) {
-      historyIdList.push(comic.id);
-    }
+    historyIdList = _.map(docs, (comic) => {
+      return comic.id;
+    });
   });
 
   let comicIdList = [];
   await Comic.find().exec(function(err, docs) {
-    for(let comic of docs) {
-      comicIdList.push(comic.id);
-    }
+    comicIdList = _.map(docs, (comic) => {
+      return comic.id;
+    });
   });
 
   let newVols = [];
   let readVols = [];
   await Vol.find().exec(function(err, docs) {
-    for(let vol of docs) {
-      if(comicIdList.indexOf(vol.id) < 0) {
-        newVols.push(vol.id);
-      } else if(historyIdList.indexOf(vol.id) >= 0) {
-        readVols.push(vol.id);
-      }
-    }
+    const volIdList = _.map(docs, (comic) => {
+      return comic.id;
+    });
+    newVols = _.difference(volIdList, comicIdList);
+    readVols = _.intersection(volIdList, historyIdList);
   });
 
   await setRead(readVols);

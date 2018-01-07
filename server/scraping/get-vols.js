@@ -1,9 +1,9 @@
 'use strict';
 
+const _ = require('lodash');
 const Spooky = require('spooky');
 
 import constant from '../config/scraping';
-import common from './common';
 import History from '../api/history/history.model';
 import Cart from '../api/cart/cart.model';
 import Vol from '../api/vol/vol.model';
@@ -19,7 +19,7 @@ module.exports = async () => {
   let titles;
   await Cart.find().exec(function(err, docs) {
     const comics = history.concat(docs);
-    titles = common.distinct(comics, 'title');
+    titles = _.uniqBy(comics, 'title');
   });
 
   return new Promise((resolve, reject) => {

@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const Spooky = require('spooky');
 
 import constant from '../config/scraping';
@@ -15,18 +16,17 @@ module.exports = async () => {
 
   let cartIdList = [];
   await Cart.find().exec(function(err, docs) {
-    for(let comic of docs) {
-      cartIdList.push(comic.id);
-    }
+    cartIdList = _.map(docs, (comic) => {
+      return comic.id;
+    });
   });
 
   let newComicIdList = [];
   await Comic.find({new: true}).exec(function(err, docs) {
-    for(let comic of docs) {
-      if(cartIdList.indexOf(comic.id) < 0) {
-        newComicIdList.push(comic.id);
-      }
-    }
+    const comicIdList = _.map(docs, (comic) => {
+      return comic.id;
+    });
+    newComicIdList = _.difference(comicIdList, cartIdList);
   });
 
   if(newComicIdList.length > 0) {
