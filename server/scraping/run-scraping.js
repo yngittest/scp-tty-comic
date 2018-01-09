@@ -27,6 +27,6 @@ module.exports = function(taskFilePath) {
     await scpTask();
     console.log('scraping finished');
     process.exit(0);
-  }
+  };
   runScp();
 };

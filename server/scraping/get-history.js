@@ -55,20 +55,20 @@ function getHistory(pagerStart, callback) {
     });
 
     spooky.then([{
-      pagerUrl: constant.urls.comicHistory + '&pageNo=',
-      pagerStart: pagerStart
+      pagerUrl: `${constant.urls.comicHistory}&pageNo=`,
+      pagerStart
     }, function() {
       const pager = this.evaluate(function() {
         return document.querySelector('.c_pager_num>ul>li:nth-last-child(3)>a').text;
       });
 
-      for(var i = pagerStart ; i <= pager; i++) {
+      for(var i = pagerStart; i <= pager; i++) {
         this.thenOpen(pagerUrl + i);
         this.then(function() {
           this.waitForSelector('input[name="deleteHistoryList"]');
         });
         this.then(function() {
-          this.emit('getHistory', (this.evaluate(function() {
+          this.emit('getHistory', this.evaluate(function() {
             var comics = [];
             Array.prototype.forEach.call(document.querySelectorAll('.c_bold>a'), function(node) {
               comics.push({
@@ -77,7 +77,7 @@ function getHistory(pagerStart, callback) {
               });
             });
             return comics;
-          })));
+          }));
         });
         this.then(function() {
           if(this.exists('.c_pager_num-next>a')) {

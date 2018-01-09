@@ -10,8 +10,7 @@ export class NavbarComponent {
   }, {
     title: 'Comic',
     state: 'comic'
-    }
-  ];
+  }];
 
   isCollapsed = true;
 

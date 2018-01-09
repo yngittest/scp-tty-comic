@@ -52,7 +52,7 @@ function getCart(callback) {
       this.waitForSelector('input[name="delComicID"]');
     });
     spooky.then(function() {
-      this.emit('getCart', (this.evaluate(function() {
+      this.emit('getCart', this.evaluate(function() {
         var comics = [];
         Array.prototype.forEach.call(document.querySelectorAll('.c_bold>a'), function(node) {
           comics.push({
@@ -61,7 +61,7 @@ function getCart(callback) {
           });
         });
         return comics;
-      })));
+      }));
     });
 
     spooky.then(function() {

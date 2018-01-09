@@ -54,7 +54,7 @@ function checkBanner(callback) {
 
   spooky.on('bnrUrl', function(url) {
     console.log(url);
-    Banner.find({}, {}, {sort: {updated: -1}, limit:1})
+    Banner.find({}, {}, {sort: {updated: -1}, limit: 1})
       .exec(function(err, docs) {
         if(docs[0]) {
           if(url !== docs[0].url) {
@@ -67,8 +67,8 @@ function checkBanner(callback) {
           console.log(`new banner: ${url}`);
         }
 
-        Banner.findOneAndUpdate({url: url}, {
-          url: url,
+        Banner.findOneAndUpdate({url}, {
+          url,
           filename: url.substr(url.lastIndexOf('/') + 1),
           updated: Date.now()
         }, {upsert: true}).exec(function() {

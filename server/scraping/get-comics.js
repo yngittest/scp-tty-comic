@@ -13,24 +13,18 @@ module.exports = async () => {
 
   let historyIdList = [];
   await History.find().exec(function(err, docs) {
-    historyIdList = _.map(docs, (comic) => {
-      return comic.id;
-    });
+    historyIdList = _.map(docs, comic => comic.id);
   });
 
   let comicIdList = [];
   await Comic.find().exec(function(err, docs) {
-    comicIdList = _.map(docs, (comic) => {
-      return comic.id;
-    });
+    comicIdList = _.map(docs, comic => comic.id);
   });
 
   let newVols = [];
   let readVols = [];
   await Vol.find().exec(function(err, docs) {
-    const volIdList = _.map(docs, (comic) => {
-      return comic.id;
-    });
+    const volIdList = _.map(docs, comic => comic.id);
     newVols = _.difference(volIdList, comicIdList);
     readVols = _.intersection(volIdList, historyIdList);
   });

@@ -8,7 +8,7 @@ import Comic from '../api/comic/comic.model';
 import Cart from '../api/cart/cart.model';
 
 module.exports = async () => {
-  if (constant.enablePutCart != 'true') {
+  if(constant.enablePutCart != 'true') {
     console.log('skip put cart');
     return;
   }
@@ -16,16 +16,12 @@ module.exports = async () => {
 
   let cartIdList = [];
   await Cart.find().exec(function(err, docs) {
-    cartIdList = _.map(docs, (comic) => {
-      return comic.id;
-    });
+    cartIdList = _.map(docs, comic => comic.id);
   });
 
   let newComicIdList = [];
   await Comic.find({new: true}).exec(function(err, docs) {
-    const comicIdList = _.map(docs, (comic) => {
-      return comic.id;
-    });
+    const comicIdList = _.map(docs, comic => comic.id);
     newComicIdList = _.difference(comicIdList, cartIdList);
   });
 

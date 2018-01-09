@@ -12,7 +12,7 @@ export class ComicComponent {
     this.$http = $http;
     this.socket = socket;
     this.$filter = $filter;
-    this.readFilter = false
+    this.readFilter = false;
   }
 
   $onInit() {
@@ -83,7 +83,7 @@ export class ComicComponent {
   }
 
   toggleReadFilter() {
-    if (this.showAll) {
+    if(this.showAll) {
       this.readFilter = undefined;
     } else {
       this.readFilter = false;
